@@ -1,0 +1,205 @@
+from tkinter import*
+from PIL import ImageTk,Image
+from random import randint
+import random
+
+root = Tk()
+root.title('Flashcards')
+root.iconbitmap()
+root.geometry("800x600")
+
+#create randomizing state function for answer_input
+def random_chord():
+
+    #Create a list of chord names
+    global our_chords
+    our_chords = ['maj73rdstringroot', 'maj74thstringroot','maj75thstringroot', 'maj76thstringroot' ]
+
+    #generate a random number
+    global rando
+    rando = randint(0, len(our_chords)-1)
+    chord = "chords/" + our_chords[rando] + ".png"
+
+    #create our chord images
+    global chord_image
+    chord_image = ImageTk.PhotoImage(Image.open(chord))
+    show_chord.config(image=chord_image, bg="white")
+
+#create chord dicitionary answer
+def chords_dictionary_answer():
+    if dictionary_radio.get() == our_chords_dictionary[answer]:
+        response = "Correct! " + our_chords_dictionary[answer].title() + " is the capital of " + answer.title()
+    else:
+        response = "Incorrect! " + our_chords_dictionary[answer].title() + " is the capital of " + answer.title()
+
+    answer_label_dictionary.config(text=response)
+
+#create answer functions
+def chord_answer():
+    answer = answer_input.get()
+    answer = answer.replace(" ","")
+
+    #determine if our answer is right or wrong
+    if answer.lower() == our_chords[rando]:
+        response = "Correct! " + our_chords[rando].title()
+    else:
+        response = "LOL NOPE! " + our_chords[rando].title()
+
+    answer_label.config(text=response)
+
+    #clear the entry box
+    answer_input.delete(0, 'end')
+
+    random_chord()
+
+#create state flashcard functions
+def chords():
+    #hide previous frames
+    hide_all_frames()
+    chord_frame.pack(fill="both", expand=1)
+    #my_label= Label(chord_frame, text="Chords").pack()
+
+    # #Create a list of chord names
+    # global our_chords
+    # our_chords = ['maj73rdstringroot', 'maj74thstringroot','maj75thstringroot', 'maj76thstringroot' ]
+    #
+    # #generate a random number
+    # global rando
+    # rando = randint(0, len(our_chords)-1)
+    # chord = "chords/" + our_chords[rando] + ".png"
+    #
+    # #create chord images
+    # global chord_image
+    # chord_image = ImageTk.PhotoImage(Image.open(chord))
+    global show_chord
+    show_chord = Label(chord_frame)
+    show_chord.pack(pady=15 )
+    random_chord()
+
+
+
+
+    #create answer input box
+    # global answer_input
+    # answer_input = Entry(chord_frame, font=("Helvetica", 18), bd=2)
+    # answer_input.pack(pady=15)
+
+    #create button to randomize chord images
+    rando_button = Button(chord_frame, text="Pass", command = chords)
+    rando_button.pack(pady=10)
+
+    #create a button to answer Button
+    answer_button = Button(chord_frame, text="Answer", command=chord_answer)
+    answer_button.pack(pady=5)
+
+    #create a label to tell us if we got the answer right
+    global answer_label
+    answer_label = Label(chord_frame, text="", font=("Helvetica", 18), bg="white")
+    answer_label.pack(pady=15)
+
+
+#create chords dictionary flashcard functions
+def chords_dictionary():
+    #hide previous frames
+    hide_all_frames()
+    chords_dictionary_frame.pack(fill="both", expand=1)
+    #my_label= Label(chords_dictionary_frame, text="Dictionary").pack()
+
+    global show_chord
+    show_chord = Label(chords_dictionary_frame)
+    show_chord.pack(pady=15 )
+
+
+
+    global our_chords
+    our_chords = ['maj73rdstringroot', 'maj74thstringroot','maj75thstringroot', 'maj76thstringroot' ]
+
+    global our_chords_dictionary
+    our_chords_dictionary = {
+    'maj73rdstringroot':'Maj7 3rd String Root',
+    'maj74thstringroot':'Maj7 4th String Root',
+    'maj75thstringroot':'Maj7 5th String Root',
+    'maj76thstringroot':'Maj7 6th String Root',
+    }
+    #create empty answer list and counter
+    answer_list = []
+    count = 1
+    global answer
+
+    # generate three random chord dictionary terms
+    while count < 4:
+        rando = randint(0, len(our_chords)-1)
+        #if first selection, make it our answer
+        if count == 1:
+            answer = our_chords[rando]
+            global chord_image
+            chord = "chords/" + our_chords[rando] + ".png"
+            chord_image = ImageTk.PhotoImage(Image.open(chord))
+            show_chord.config(image=chord_image)
+
+        #add our first selection to a new list
+        answer_list.append(our_chords[rando])
+
+        #remove from old list
+        our_chords.remove(our_chords[rando])
+
+        #shuffle our original list
+        random.shuffle(our_chords)
+        count += 1
+
+    random.shuffle(answer_list)
+
+    global dictionary_radio
+    dictionary_radio = StringVar()
+    dictionary_radio.set(our_chords_dictionary[answer_list[0]])
+
+
+    dictionary_radio_butto1 = Radiobutton (chord_frame, text=our_chords_dictionary[answer_list[0]], variable=dictionary_radio, value=our_chords_dictionary[answer_list[0]]).pack()
+    dictionary_radio_butto2 = Radiobutton (chord_frame, text=our_chords_dictionary[answer_list[1]], variable=dictionary_radio, value=our_chords_dictionary[answer_list[1]]).pack()
+    dictionary_radio_butto3 = Radiobutton (chord_frame, text=our_chords_dictionary[answer_list[2]], variable=dictionary_radio, value=our_chords_dictionary[answer_list[2]]).pack()
+
+# add a pass button
+    pass_button = Button(chords_dictionary_frame, text="Pass", command=chords_dictionary)
+    pass_button.pack(pady=15)
+
+    # create button for answer_list
+    dictionary_answer_button = Button(chords_dictionary_frame, text="Answer", command=chords_dictionary_answer)
+    dictionary_answer_button.pack(pady=15)
+
+    # create an answer Label
+    global answer_label_dictionary
+    answer_label_dictionary = Label(chords_dictionary_frame, text="", font=("Helvetica", 18))
+    answer_label_dictionary.pack(pady=15)
+
+#hide all previous frames
+def hide_all_frames():
+    #loop thru and destory all children in previous frames
+    for widget in chord_frame.winfo_children():
+        widget.destroy()
+
+    for widget in chords_dictionary_frame.winfo_children():
+        widget.destroy()
+
+    chord_frame.pack_forget()
+    chords_dictionary_frame.pack_forget()
+
+#create menu
+my_menu = Menu(root)
+root.config(menu=my_menu)
+
+#create geography menu items
+chords_menu = Menu(my_menu)
+my_menu.add_cascade(label="Decks", menu=chords_menu)
+chords_menu.add_command(label="Chords", command=chords)
+chords_menu.add_command(label="Major 7 Shapes", command=chords_dictionary)
+chords_menu.add_separator()
+chords_menu.add_command(label="Exit", command=root.quit)
+
+#create our frames
+chord_frame = Frame(root, width=500, height=500, bg="white")
+chords_dictionary_frame = Frame(root, width=500, height=500, bg="white" )
+
+
+
+
+root.mainloop()
